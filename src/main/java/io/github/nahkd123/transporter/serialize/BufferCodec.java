@@ -117,12 +117,12 @@ public interface BufferCodec<T> extends BufferEncoder<T>, BufferDecoder<T> {
 		(v, b) -> {
 			if (v < 0) throw new IllegalArgumentException("Value %d is negative (encoding vuint)".formatted(v));
 
-			while (v != 0) {
+			do {
 				int bv = v & 0x7F;
 				v >>= 7;
 				if (v != 0) bv |= 0x80;
 				b.put((byte) bv);
-			}
+			} while (v != 0);
 		},
 		b -> {
 			int v = 0, bv, shift = 0;
@@ -144,7 +144,7 @@ public interface BufferCodec<T> extends BufferEncoder<T>, BufferDecoder<T> {
 	BufferCodec<byte[]> LPBYTES = of(
 		(v, b) -> {
 			VUINT.encode(v.length, b);
-			b.put(b);
+			b.put(v);
 		},
 		b -> {
 			int length = VUINT.decode(b);
