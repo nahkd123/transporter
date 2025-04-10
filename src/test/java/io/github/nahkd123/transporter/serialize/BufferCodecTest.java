@@ -23,4 +23,29 @@ class BufferCodecTest {
 		buf.flip();
 		assertEquals(0, BufferCodec.VUINT.decode(buf));
 	}
+
+	@Test
+	void testComplex() {
+		record Customer(String name, int age, String rewardCode) {
+		}
+
+		BufferCodec<Customer> customerCodec = BufferCodec.tupleOf(
+			BufferCodec.UTF8, Customer::name,
+			BufferCodec.I32, Customer::age,
+			BufferCodec.UTF8.asNullable(), Customer::rewardCode,
+			Customer::new);
+
+		ByteBuffer buf = ByteBuffer.allocate(128);
+		Customer alice = new Customer("Alice", 42, null);
+		customerCodec.encode(alice, buf);
+		buf.flip();
+		assertEquals(alice, customerCodec.decode(buf));
+		buf.clear();
+
+		Customer bob = new Customer("Bob", 27, "727-727");
+		customerCodec.encode(bob, buf);
+		buf.flip();
+		assertEquals(bob, customerCodec.decode(buf));
+		buf.clear();
+	}
 }

@@ -91,6 +91,17 @@ public interface BufferCodec<T> extends BufferEncoder<T>, BufferDecoder<T> {
 
 	/**
 	 * <p>
+	 * Create codec that accept null value.
+	 * </p>
+	 * 
+	 * @return A new codec that can accept null value.
+	 */
+	default BufferCodec<T> asNullable() {
+		return new NullableCodec<>(this);
+	}
+
+	/**
+	 * <p>
 	 * Create a new buffer codec from a pair of encoder and decoder.
 	 * </p>
 	 * 
@@ -107,6 +118,9 @@ public interface BufferCodec<T> extends BufferEncoder<T>, BufferDecoder<T> {
 	BufferCodec<Short> I16 = of((v, b) -> b.putShort(v), ByteBuffer::getShort);
 	BufferCodec<Integer> I32 = of((v, b) -> b.putInt(v), ByteBuffer::getInt);
 	BufferCodec<Long> I64 = of((v, b) -> b.putLong(v), ByteBuffer::getLong);
+	BufferCodec<Float> F32 = of((v, b) -> b.putFloat(v), ByteBuffer::getFloat);
+	BufferCodec<Double> F64 = of((v, b) -> b.putDouble(v), ByteBuffer::getDouble);
+	BufferCodec<Boolean> BOOL = of((v, b) -> b.put(v ? (byte) 1 : 0), b -> b.get() != 0);
 
 	/**
 	 * <p>
@@ -138,7 +152,7 @@ public interface BufferCodec<T> extends BufferEncoder<T>, BufferDecoder<T> {
 
 	/**
 	 * <p>
-	 * Variable-length prefixed byte array.
+	 * Variable-length byte array with variable unsigned integer prefix as length.
 	 * </p>
 	 */
 	BufferCodec<byte[]> LPBYTES = of(
@@ -155,7 +169,7 @@ public interface BufferCodec<T> extends BufferEncoder<T>, BufferDecoder<T> {
 
 	/**
 	 * <p>
-	 * Variable-length prefixed UTF-8 string.
+	 * UTF-8 string wraps around {@link #LPBYTES}.
 	 * </p>
 	 */
 	BufferCodec<String> UTF8 = LPBYTES.map(

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.nahkd123</groupId>
 	<artifactId>transporter</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.2</version>
 	<name>Transporter</name>
 	<description>Library with abstraction layers for easier socket programming</description>
 	<properties>
